@@ -1,0 +1,44 @@
+---
+const { title = 'Notes' } = Astro.props as { title?: string };
+---
+
+<header class="app-header">
+  <div class="left">
+    <h2>{title}</h2>
+  </div>
+  <div class="right">
+    <input id="search-input" type="search" placeholder="Search notes..." aria-label="Search notes" />
+    <a class="btn btn-accent" href="/app/new">New</a>
+  </div>
+</header>
+
+<style>
+  .app-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border-radius: 12px;
+  }
+  .left h2 { margin: 0; font-size: 16px; }
+  .right { display: flex; align-items: center; gap: 10px; }
+  #search-input {
+    height: 34px; padding: 0 10px; border-radius: 8px;
+    border: 1px solid var(--border-color); outline: none;
+    background: transparent; color: var(--text-color);
+    min-width: 220px;
+  }
+  #search-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 25%, transparent); }
+</style>
+
+<script>
+  import { useNotesStore } from '../store/useNotesStore';
+  // Attach to store
+  const store = useNotesStore.getState();
+  const input = document.getElementById('search-input');
+  if (input) {
+    input.addEventListener('input', (e) => {
+      store.setQuery(e.target.value);
+    });
+  }
+</script>

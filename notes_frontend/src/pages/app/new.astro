@@ -1,0 +1,14 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import NoteEditor from '../../components/NoteEditor.astro';
+---
+
+<Layout>
+  <section class="wrap">
+    <NoteEditor note={null} />
+  </section>
+</Layout>
+
+<style>
+  .wrap { max-width: 980px; margin: 0 auto; }
+</style>

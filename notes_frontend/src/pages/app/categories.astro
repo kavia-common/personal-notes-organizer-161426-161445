@@ -1,0 +1,40 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="wrap">
+    <h3>Categories</h3>
+    <div id="cats" class="grid"></div>
+  </section>
+</Layout>
+
+<style>
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .grid { display: flex; gap: 10px; flex-wrap: wrap; }
+  .cat {
+    border: 1px solid var(--border-color); border-radius: 999px; padding: 8px 12px;
+    background: var(--card-bg);
+  }
+</style>
+
+<script>
+  import { fetchNotes } from '../../lib/notes';
+  import { getCurrentUser } from '../../lib/auth';
+
+  async function boot() {
+    const root = document.getElementById('cats');
+    const user = getCurrentUser();
+    const list = await fetchNotes(user);
+    const set = new Set();
+    list.forEach(n => { if (n.category) set.add(n.category); });
+    root.innerHTML = '';
+    Array.from(set).sort().forEach(c => {
+      const el = document.createElement('span');
+      el.className = 'cat';
+      el.textContent = c;
+      root.appendChild(el);
+    });
+  }
+  boot();
+</script>

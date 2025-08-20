@@ -1,0 +1,74 @@
+---
+const { tags = [], categories = [] } = Astro.props as { tags?: string[]; categories?: string[] };
+---
+
+<aside class="filters">
+  <div class="group">
+    <h4>Tags</h4>
+    <div class="chips" id="tag-chips">
+      {tags.map(t => <button class="chip" data-value={t}>{t}</button>)}
+    </div>
+  </div>
+
+  <div class="group">
+    <h4>Categories</h4>
+    <div class="chips" id="cat-chips">
+      {categories.map(c => <button class="chip" data-value={c}>{c}</button>)}
+    </div>
+  </div>
+</aside>
+
+<style>
+  .filters { display: grid; gap: 16px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; }
+  .group h4 { margin: 0 0 8px; font-size: 14px; color: var(--text-secondary); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 1px solid var(--border-color);
+    padding: 6px 10px; border-radius: 999px; background: transparent; color: var(--text-color);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .chip.active { background: color-mix(in srgb, var(--color-secondary) 25%, transparent); border-color: var(--color-secondary); }
+</style>
+
+<script>
+  import { useNotesStore } from '../store/useNotesStore';
+  const store = useNotesStore.getState();
+
+  function toggleChip(list, value) {
+    const idx = list.indexOf(value);
+    if (idx >= 0) list.splice(idx, 1);
+    else list.push(value);
+    return list.slice();
+  }
+
+  function setActive(container, activeList) {
+    container.querySelectorAll('.chip').forEach(el => {
+      el.classList.toggle('active', activeList.includes(el.dataset.value));
+    });
+  }
+
+  const tagWrap = document.getElementById('tag-chips');
+  const catWrap = document.getElementById('cat-chips');
+  const state = useNotesStore.getState();
+
+  if (tagWrap) {
+    tagWrap.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      const value = btn.dataset.value;
+      const next = toggleChip(state.tagFilters.slice(), value);
+      state.setTagFilters(next);
+      setActive(tagWrap, next);
+    });
+  }
+  if (catWrap) {
+    catWrap.addEventListener('click', (e) => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      const value = btn.dataset.value;
+      const next = state.categoryFilter === value ? null : value;
+      state.setCategoryFilter(next);
+      catWrap.querySelectorAll('.chip').forEach(el => el.classList.toggle('active', el.dataset.value === next));
+    });
+  }
+</script>

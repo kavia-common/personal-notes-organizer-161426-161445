@@ -1,0 +1,40 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="wrap">
+    <h3>Tags</h3>
+    <div id="tags" class="grid"></div>
+  </section>
+</Layout>
+
+<style>
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .grid { display: flex; gap: 10px; flex-wrap: wrap; }
+  .tag {
+    border: 1px solid var(--border-color); border-radius: 999px; padding: 8px 12px;
+    background: var(--card-bg);
+  }
+</style>
+
+<script>
+  import { fetchNotes } from '../../lib/notes';
+  import { getCurrentUser } from '../../lib/auth';
+
+  async function boot() {
+    const root = document.getElementById('tags');
+    const user = getCurrentUser();
+    const list = await fetchNotes(user);
+    const set = new Set();
+    list.forEach(n => (n.tags || []).forEach(t => set.add(t)));
+    root.innerHTML = '';
+    Array.from(set).sort().forEach(t => {
+      const el = document.createElement('span');
+      el.className = 'tag';
+      el.textContent = t;
+      root.appendChild(el);
+    });
+  }
+  boot();
+</script>

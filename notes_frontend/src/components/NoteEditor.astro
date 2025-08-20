@@ -1,0 +1,76 @@
+---
+const { note = null } = Astro.props as { note?: any | null };
+const isNew = !note;
+---
+
+<form id="note-form" class="editor">
+  <div class="row">
+    <input name="title" id="title" class="title" type="text" placeholder="Note title" value={note?.title || ''} />
+    <div class="right">
+      <input name="category" id="category" class="category" type="text" placeholder="Category" value={note?.category || ''} />
+      <input name="tags" id="tags" class="tags" type="text" placeholder="Comma separated tags" value={(note?.tags || []).join(', ')} />
+      <button class="btn btn-accent" type="submit">{isNew ? 'Create' : 'Save'}</button>
+      {!isNew && <button id="delete-btn" class="btn btn-outline" type="button" aria-label="Delete">Delete</button>}
+    </div>
+  </div>
+  <textarea name="content" id="content" rows="16" placeholder="Write your note here...">{note?.content || ''}</textarea>
+</form>
+
+<style>
+  .editor { display: grid; gap: 10px; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .title { flex: 1; height: 40px; border-radius: 10px; border: 1px solid var(--border-color); padding: 0 12px; background: var(--card-bg); color: var(--text-color); }
+  .right { display: flex; align-items: center; gap: 8px; }
+  .category, .tags { height: 36px; border-radius: 10px; border: 1px solid var(--border-color); padding: 0 10px; background: var(--card-bg); color: var(--text-color); }
+  textarea { width: 100%; border-radius: 12px; border: 1px solid var(--border-color); padding: 12px; background: var(--card-bg); color: var(--text-color); resize: vertical; }
+  @media (max-width: 900px) {
+    .row { flex-direction: column; align-items: stretch; }
+    .right { flex-wrap: wrap; }
+  }
+</style>
+
+<script>
+  import { getCurrentUser } from '../lib/auth';
+  import { createNote, updateNote, deleteNote } from '../lib/notes';
+
+  const form = document.getElementById('note-form');
+  const params = new URLSearchParams(location.search);
+  const noteId = location.pathname.split('/').pop();
+  const isNew = location.pathname.endsWith('/new');
+  const user = getCurrentUser();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const tags = (fd.get('tags') || '').toString().split(',').map(s => s.trim()).filter(Boolean);
+    const payload = {
+      title: (fd.get('title') || '').toString(),
+      content: (fd.get('content') || '').toString(),
+      category: (fd.get('category') || '').toString() || null,
+      tags,
+    };
+    try {
+      if (isNew) {
+        const note = await createNote(user, payload);
+        location.href = `/app/edit/${note.id}`;
+      } else {
+        await updateNote(user, noteId, payload);
+        alert('Saved');
+      }
+    } catch (err) {
+      alert(err?.message || 'Failed to save');
+    }
+  }
+  form?.addEventListener('submit', handleSubmit);
+
+  const delBtn = document.getElementById('delete-btn');
+  delBtn?.addEventListener('click', async () => {
+    if (!confirm('Delete this note?')) return;
+    try {
+      await deleteNote(user, noteId);
+      location.href = '/app';
+    } catch (e) {
+      alert('Failed to delete');
+    }
+  });
+</script>

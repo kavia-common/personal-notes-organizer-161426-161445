@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="wrap">
+    <h3>Help</h3>
+    <ol>
+      <li>Login or register to start.</li>
+      <li>Create a note using the New button.</li>
+      <li>Use tags and category fields to organize.</li>
+      <li>Search and filter from the All Notes page.</li>
+    </ol>
+    <p class="muted">Note: If no backend API is configured, the app falls back to localStorage for demo purposes.</p>
+  </section>
+</Layout>
+
+<style>
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .muted { color: var(--text-secondary); }
+</style>

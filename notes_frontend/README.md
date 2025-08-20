@@ -1,47 +1,42 @@
-# Astro Starter Kit: Minimal
+# Notes Frontend (Astro)
 
-```sh
-npm create astro@latest -- --template minimal
-```
+A modern, minimalistic notes app frontend built with Astro. Features:
+- User login and registration
+- Create, read, update, delete notes
+- Organize notes by tags or categories
+- Search and filter notes
+- Responsive design with sidebar, header, content, and footer
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+Colors: primary #2D9CDB, secondary #56CCF2, accent #F2994A
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Environment
 
-## 🚀 Project Structure
+Copy `.env.example` to `.env` and set values:
+- PUBLIC_API_BASE_URL: Base URL for backend API (e.g., http://localhost:8000)
+- PUBLIC_DEBUG: optional boolean to enable debug logs
 
-Inside of your Astro project, you'll see the following folders and files:
+Astro automatically exposes variables prefixed with `PUBLIC_` on the client.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## Scripts
+- npm install
+- npm run dev
+- npm run build
+- npm run preview
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Structure
+- src/pages: route pages (auth, app, help)
+- src/components: UI components (editor, list, header, filters, theme toggle)
+- src/lib: environment, API client, auth, notes logic
+- src/store: Zustand store for client state
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Backend Integration
+The app calls:
+- POST /auth/login, POST /auth/register
+- GET /notes, POST /notes, PUT /notes/:id, DELETE /notes/:id
 
-Any static assets, like images, can be placed in the `public/` directory.
+If the API is unavailable, the app falls back to localStorage for demo use.
 
-## 🧞 Commands
+## Security Note
+- Never hardcode secrets in code.
+- Use environment variables as shown above.
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
