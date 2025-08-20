@@ -1,0 +1,83 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AppHeader from '../../components/AppHeader.astro';
+import SidebarFilters from '../../components/SidebarFilters.astro';
+import NoteList from '../../components/NoteList.astro';
+---
+
+<Layout>
+  <div class="grid">
+    <div class="col">
+      <AppHeader title="All Notes" />
+      <div class="panel">
+        <div id="filters"></div>
+        <div id="notes"></div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .panel { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+  #filters, #notes { min-height: 300px; }
+  @media (max-width: 900px) {
+    .panel { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  import { fetchNotes, searchNotes } from '../../lib/notes';
+  import { getCurrentUser } from '../../lib/auth';
+  import { useNotesStore } from '../../store/useNotesStore';
+
+  const user = getCurrentUser();
+  const state = useNotesStore.getState();
+
+  async function boot() {
+    try {
+      state.setLoading(true);
+      const list = await fetchNotes(user);
+      state.setNotes(list);
+      render();
+    } catch (e) {
+      state.setError(e?.message || 'Failed to load notes');
+    } finally {
+      state.setLoading(false);
+    }
+  }
+
+  function getTagsAndCategories(notes) {
+    const tagSet = new Set();
+    const catSet = new Set();
+    notes.forEach(n => {
+      (n.tags || []).forEach(t => tagSet.add(t));
+      if (n.category) catSet.add(n.category);
+    });
+    return { tags: Array.from(tagSet), categories: Array.from(catSet) };
+  }
+
+  function render() {
+    const rootFilters = document.getElementById('filters');
+    const rootNotes = document.getElementById('notes');
+    if (!rootFilters || !rootNotes) return;
+
+    const { tags, categories } = getTagsAndCategories(state.notes);
+
+    rootFilters.innerHTML = '';
+    rootNotes.innerHTML = '';
+
+    const filters = Astro.render(SidebarFilters, { tags, categories });
+    const filtered = searchNotes(state.notes, state.query, state.tagFilters, state.categoryFilter);
+    const list = Astro.render(NoteList, { notes: filtered, selectedId: null });
+
+    rootFilters.appendChild(filters);
+    rootNotes.appendChild(list);
+  }
+
+  boot();
+
+  // Re-render when filters or query change
+  const unsub = useNotesStore.subscribe(render);
+  window.addEventListener('beforeunload', () => unsub && unsub());
+</script>

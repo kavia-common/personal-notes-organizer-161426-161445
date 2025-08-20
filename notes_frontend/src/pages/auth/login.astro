@@ -1,0 +1,46 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="auth">
+    <div class="card">
+      <h3>Login</h3>
+      <form id="login-form" class="form">
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" required minlength="6" />
+        <button class="btn btn-accent" type="submit">Login</button>
+        <p class="hint">No account? <a href="/auth/register">Register</a></p>
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .auth { display: grid; place-items: center; min-height: calc(100dvh - 140px); }
+  .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 20px; width: 100%; max-width: 380px; box-shadow: 0 10px 28px var(--shadow-color); }
+  h3 { margin: 0 0 12px; }
+  .form { display: grid; gap: 10px; }
+  .form input { height: 40px; border: 1px solid var(--border-color); border-radius: 10px; background: transparent; color: var(--text-color); padding: 0 12px; }
+  .hint { color: var(--text-secondary); font-size: 14px; margin: 10px 0 0; }
+  .hint a { color: var(--color-primary); text-decoration: none; }
+</style>
+
+<script>
+  import { login, setCurrentUser } from '../../lib/auth';
+
+  const form = document.getElementById('login-form');
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const email = fd.get('email')?.toString() || '';
+    const password = fd.get('password')?.toString() || '';
+    try {
+      const user = await login(email, password);
+      setCurrentUser(user);
+      location.href = '/app';
+    } catch (err) {
+      alert(err?.message || 'Login failed');
+    }
+  });
+</script>

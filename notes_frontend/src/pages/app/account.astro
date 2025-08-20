@@ -1,0 +1,27 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout>
+  <section class="wrap">
+    <h3>Account</h3>
+    <div id="info" class="card"></div>
+  </section>
+</Layout>
+
+<style>
+  .wrap { max-width: 980px; margin: 0 auto; }
+  .card { border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; background: var(--card-bg); }
+  .muted { color: var(--text-secondary); }
+</style>
+
+<script>
+  import { getCurrentUser } from '../../lib/auth';
+  const root = document.getElementById('info');
+  const user = getCurrentUser();
+  if (user) {
+    root.innerHTML = `<p><strong>Email:</strong> ${user.email}</p><p class="muted">Token: ${user.token.slice(0, 6)}... (hidden)</p>`;
+  } else {
+    root.innerHTML = '<p>You are not logged in. <a href="/auth/login">Login</a></p>';
+  }
+</script>

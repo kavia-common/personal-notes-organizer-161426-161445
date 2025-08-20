@@ -1,0 +1,42 @@
+---
+import dayjs from 'dayjs';
+const { notes = [], selectedId = null } = Astro.props as { notes?: any[]; selectedId?: string | null };
+---
+
+<div class="list">
+  {notes.map(n => (
+    <a class={{ item: true, active: selectedId === n.id }} href={`/app/edit/${n.id}`}>
+      <div class="title-row">
+        <h4>{n.title || 'Untitled'}</h4>
+        <span class="date">{dayjs(n.updatedAt).format('MMM D, YYYY')}</span>
+      </div>
+      <p class="preview">{(n.content || '').slice(0, 120)}</p>
+      <div class="meta">
+        <div class="tags">
+          {n.tags?.map(t => <span class="tag">{t}</span>)}
+        </div>
+        {n.category && <span class="cat">{n.category}</span>}
+      </div>
+    </a>
+  ))}
+</div>
+
+<style>
+  .list { display: grid; gap: 10px; }
+  .item {
+    display: grid; gap: 6px;
+    padding: 10px 12px; border: 1px solid var(--border-color);
+    background: var(--card-bg); border-radius: 12px; text-decoration: none; color: inherit;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .item:hover { transform: translateY(-1px); box-shadow: 0 6px 14px var(--shadow-color); }
+  .item.active { outline: 2px solid color-mix(in srgb, var(--color-primary) 55%, transparent); }
+  .title-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .title-row h4 { margin: 0; font-size: 15px; font-weight: 600; }
+  .date { color: var(--text-secondary); font-size: 12px; }
+  .preview { margin: 0; color: var(--text-secondary); font-size: 13px; }
+  .meta { display: flex; justify-content: space-between; align-items: center; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border-color); }
+  .cat { font-size: 11px; color: var(--color-primary); }
+</style>

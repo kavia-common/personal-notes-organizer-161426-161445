@@ -1,0 +1,31 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import NoteEditor from '../../../components/NoteEditor.astro';
+---
+
+<Layout>
+  <section class="wrap">
+    <div id="editor"></div>
+  </section>
+</Layout>
+
+<style>
+  .wrap { max-width: 980px; margin: 0 auto; }
+</style>
+
+<script>
+  import { fetchNotes } from '../../../lib/notes';
+  import { getCurrentUser } from '../../../lib/auth';
+
+  async function boot() {
+    const container = document.getElementById('editor');
+    const user = getCurrentUser();
+    const notes = await fetchNotes(user);
+    const id = location.pathname.split('/').pop();
+    const note = notes.find(n => n.id === id) || null;
+    const node = Astro.render(NoteEditor, { note });
+    container.innerHTML = '';
+    container.appendChild(node);
+  }
+  boot();
+</script>
